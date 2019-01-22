@@ -34,6 +34,11 @@ export interface Contact {
   phone?: Number;
 }
 
+export const TripSchema = new Schema({
+  servicetype: { type: String },
+  servicename: { type: String }
+});
+
 export const InterventionSchema = new Schema({
   seqno: { type: String },
   streetname: { type: String },
@@ -51,7 +56,7 @@ export const InterventionSchema = new Schema({
   callername: { type: String },
   controlroomname: { type: String },
   sectorcode: { type: String },
-  trip: { type: Array }
+  trip: [TripSchema]
 });
 
 export interface Trip {
