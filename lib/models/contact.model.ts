@@ -51,14 +51,12 @@ export const InterventionSchema = new Schema({
   callername: { type: String },
   controlroomname: { type: String },
   sectorcode: { type: String },
-  tripservicetype: { type: String },
-  tripservicename: { type: String }
+  trip: { type: Array }
 });
 
-export enum Description1733 {
-  visite_domicile = "1733 VISITE DOMICILE",
-  report = "1733 REPORT",
-  consultation = "1733 CONSULTATION PMG"
+export interface Trip {
+  servicetype?: string;
+  servicename?: string;
 }
 
 export interface Intervention {
@@ -69,7 +67,7 @@ export interface Intervention {
   longitude?: string;
   latitude?: string;
   numcasualties?: string;
-  description?: Description1733;
+  description?: string;
   remarks?: string;
   callref?: string;
   date?: string;
@@ -78,6 +76,5 @@ export interface Intervention {
   callername?: string;
   controlroomname?: string;
   sectorcode?: string;
-  tripservicetype?: string;
-  tripservicename?: string;
+  trip?: Trip[];
 }

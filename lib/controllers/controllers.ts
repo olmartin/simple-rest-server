@@ -1,10 +1,31 @@
 import * as mongoose from "mongoose";
 import { Request, Response } from "express";
-import { ContactSchema } from "../models/contact.model";
+import {
+  ContactSchema,
+  InterventionSchema,
+  Intervention
+} from "../models/contact.model";
 
 const MgContact = mongoose.model("Contact", ContactSchema);
+const MgIntervention = mongoose.model("Intervention", InterventionSchema);
 
 export class ContactController {
+  public addNewIntervention(req: Request, res: Response) {
+    let newIntervention = new MgIntervention(req.body);
+    newIntervention.save((err, contact) => {
+      err ? res.send(err) : res.json(contact);
+    });
+  }
+
+  public getInterventions(req: Request, res: Response) {
+    MgIntervention.find({}, (err, contact) => {
+      err ? res.send(err) : res.json(contact);
+    });
+  }
+
+  //
+  // Contact test examples
+  //
   public addNewContact(req: Request, res: Response) {
     let newContact = new MgContact(req.body);
 

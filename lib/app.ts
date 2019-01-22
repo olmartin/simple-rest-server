@@ -4,7 +4,7 @@ import { Routes } from "./routes/routes";
 import * as mongoose from "mongoose";
 import axios, { AxiosResponse } from "axios";
 import { parseString } from "xml2js";
-import { Contact } from "./models/contact.model";
+import { Contact, Intervention } from "./models/contact.model";
 
 class App {
   public app: express.Application;
@@ -16,8 +16,8 @@ class App {
     this.config();
     this.routes.routes(this.app);
     this.mongoSetup();
-    this.test_xml();
-    this.test_get_all();
+    //this.test_xml_w3();
+    this.test_parse_and_save();
   }
 
   private config(): void {
@@ -32,32 +32,41 @@ class App {
     mongoose.connect(this.mongoUrl);
   }
 
-  private test_get_all() {
-    axios
-      .get("http://localhost:3000/contact")
-      .then((response: AxiosResponse<Contact[]>) => {
-        console.log("--- All Contacts ---\n", response.data, "\n");
+  private test_parse_and_save() {
+    const xml_pmg =
+      '<intervention seqno="0030" streetname="avenue du chien" cityname="cityname" longitude="5.82151822858613" latitude="49.6871032992925" description="desc" remarks="zbra" callref="2019-000-0000" date="2019-01-22" time="10:10:10" phoneno="" controlroomname="ctrl" sectorcode="be" servicename="PMG X"><trip servicetype="PMG" servicename="PMG X"/><trip servicetype="STT" servicename="X - PMG Y"/></intervention>';
+    this.toJson(xml_pmg)
+      .then(data => {
+        const intervention = data.intervention.$ as Intervention;
+        if (data.intervention.trip)
+          intervention.trip = data.intervention.trip.map(t => t.$);
+        return intervention;
       })
-      .catch(error => {
-        console.log(error);
+      .then((intervention: Intervention) => {
+        console.log(intervention);
+        axios
+          .post("http://localhost:3000/intervention", intervention)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
       })
-      .then(() => {});
+      .catch(err => {
+        console.error("xml parse fail", err);
+      });
   }
 
-  private test_xml() {
+  private test_xml_w3() {
     axios
       .get("https://www.w3schools.com/xml/note.xml")
       .then((response: AxiosResponse<any>) => {
-        const xml = response.data;
-        console.log("--- XML ---\n", xml, "\n");
-        this.toJson(xml).then(obj => {
-          console.log("--- JSON ---\n", obj, "\n");
-        });
+        console.log(response.data);
       })
       .catch(error => {
         console.log(error);
-      })
-      .then(() => {});
+      });
   }
 
   private toJson(xml: string): Promise<any> {
